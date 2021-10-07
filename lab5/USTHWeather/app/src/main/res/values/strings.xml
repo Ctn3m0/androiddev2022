@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">USTH Weather</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <!-- Days -->
+    <string name="mon">Monday</string>
+    <string name="tue">Tuesday</string>
+    <string name="wed">Wednesday</string>
+    <string name="thu">Thursday</string>
+    <string name="fri">Friday</string>
+    <string name="Sat">Saturday</string>
+    <string name="Su">Sunday</string>
+    <!-- Days -->
+
+</resources>
