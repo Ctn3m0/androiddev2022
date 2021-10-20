@@ -2,28 +2,25 @@ package vn.edu.usth.weather;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class WeatherActivity extends AppCompatActivity {
     String msg = "Device is ";
@@ -63,6 +60,38 @@ public class WeatherActivity extends AppCompatActivity {
 
         Log.i(msg, "onCreate() event");
 
+
+        //lab 13
+//        final Handler handler = new Handler(Looper.getMainLooper()) {
+//            @Override
+//            public void handleMessage(Message msg) {
+//                // This method is executed in main thread
+//                String content = msg.getData().getString("server_response");
+//                Toast.makeText(WeatherActivity.this, content, Toast.LENGTH_SHORT).show();
+//            }
+//        };
+//        Thread t = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                // this method is run in a worker thread
+//                try {
+//                // wait for 5 seconds to simulate a long network access
+//                    Thread.sleep(5000);
+//                }
+//                catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                // Assume that we got our data from server
+//                Bundle bundle = new Bundle();
+//                bundle.putString("server_response", "some sample json here");
+//                // notify main thread
+//                Message msg = new Message();
+//                msg.setData(bundle);
+//                handler.sendMessage(msg);
+//            }
+//        });
+//        t.start();
+
 //        FragmentManager fm = getSupportFragmentManager();
 //        Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
 //
@@ -70,6 +99,42 @@ public class WeatherActivity extends AppCompatActivity {
 //            fragment = new ForecastFragment();
 //            fm.beginTransaction().add(R.id.fragmentContainer, fragment).commit();
 //        }
+        AsyncTask<String, Integer, Message> task = new AsyncTask<String, Integer, Message>() {
+            @Override
+            protected void onPreExecute() {
+                // do some preparation here, if needed
+            }
+            @Override
+            protected Message doInBackground(String... params) {
+                try {
+                    // wait for 5 seconds to simulate a long network access
+                    Thread.sleep(5000);
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // Assume that we got our data from server
+                Bundle bundle = new Bundle();
+                bundle.putString("server_response", "some sample json here");
+                // notify main thread
+                Message msg = new Message();
+                msg.setData(bundle);
+                return msg;
+            }
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                // This method is called in the main thread, so it's possible
+                // to update UI to reflect the worker thread progress here.
+                // In a network access task, this should update a progress bar
+                // to reflect how many percent of data has been retrieved
+            }
+            @Override
+            protected void onPostExecute(Message msg) {
+                String content = msg.getData().getString("server_response");
+                Toast.makeText(WeatherActivity.this, content, Toast.LENGTH_SHORT).show();
+            }
+        };
+        task.execute("http://ict.usth.edu.vn/wp-content/uploads/usth/usthlogo.png");
     }
 
     @Override
