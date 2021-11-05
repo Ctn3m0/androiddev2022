@@ -6,6 +6,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,10 +19,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class WeatherActivity extends AppCompatActivity {
     String msg = "Device is ";
@@ -30,10 +38,15 @@ public class WeatherActivity extends AppCompatActivity {
     MediaPlayer player;
     private static final String FILE_NAME = "./res/raw/music.mp3";
 
+    Bitmap bitmap;
+    ImageView logo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+        View v = findViewById(R.id.fragmentContainer);
+
 
         mViewPager = findViewById(R.id.view_pager);
         mTabLayout = findViewById(R.id.tab_layout);
@@ -99,6 +112,7 @@ public class WeatherActivity extends AppCompatActivity {
 //            fragment = new ForecastFragment();
 //            fm.beginTransaction().add(R.id.fragmentContainer, fragment).commit();
 //        }
+        Toast.makeText(this,"Hello",Toast.LENGTH_SHORT).show();
         AsyncTask<String, Integer, Message> task = new AsyncTask<String, Integer, Message>() {
             @Override
             protected void onPreExecute() {
@@ -108,9 +122,25 @@ public class WeatherActivity extends AppCompatActivity {
             protected Message doInBackground(String... params) {
                 try {
                     // wait for 5 seconds to simulate a long network access
-                    Thread.sleep(5000);
+//                    Thread.sleep(5000);
+//                  initialize URL
+                    URL url = new URL("https://scontent.fhan5-4.fna.fbcdn.net/v/t1.6435-9/125857765_1725430770952001_1392290274241224086_n.png?_nc_cat=104&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=UcrQbMTIZTYAX_Fq994&_nc_ht=scontent.fhan5-4.fna&oh=2c27fa6fe14d067511b9d8abd1784722&oe=61A8F96F");
+                    // Make a request to server
+                    HttpURLConnection connection =
+                            (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setDoInput(true);
+                    // allow reading response code and response dataconnection.
+                    connection.connect();
+                    // Receive response
+                    int response = connection.getResponseCode();
+                    Log.i("USTHWeather", "The response is: " + response);
+                    InputStream is = connection.getInputStream();
+                    // Process image response
+                    bitmap = BitmapFactory.decodeStream(is);
+                    connection.disconnect();
                 }
-                catch (InterruptedException e) {
+                catch (IOException e) {
                     e.printStackTrace();
                 }
                 // Assume that we got our data from server
@@ -127,14 +157,18 @@ public class WeatherActivity extends AppCompatActivity {
                 // to update UI to reflect the worker thread progress here.
                 // In a network access task, this should update a progress bar
                 // to reflect how many percent of data has been retrieved
+//                logo = (ImageView) findViewById(R.id.logo);
+//                logo.setImageBitmap(bitmap);
+
             }
             @Override
             protected void onPostExecute(Message msg) {
+                v.setBackground(new BitmapDrawable(bitmap));
                 String content = msg.getData().getString("server_response");
                 Toast.makeText(WeatherActivity.this, content, Toast.LENGTH_SHORT).show();
             }
         };
-        task.execute("http://ict.usth.edu.vn/wp-content/uploads/usth/usthlogo.png");
+        task.execute("https://scontent.fhan5-4.fna.fbcdn.net/v/t1.6435-9/125857765_1725430770952001_1392290274241224086_n.png?_nc_cat=104&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=UcrQbMTIZTYAX_Fq994&_nc_ht=scontent.fhan5-4.fna&oh=2c27fa6fe14d067511b9d8abd1784722&oe=61A8F96F");
     }
 
     @Override
